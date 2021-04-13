@@ -29,8 +29,6 @@ print(TITLE)
 
 sleep(2)
 
-clear()
-
 def clear():
         # for windows
     if name == 'nt':
@@ -40,16 +38,52 @@ def clear():
     else:
         _ = system('clear')
 
+clear()
 
 class Player:
     def __init__(self, name, health, bag, room_name):
         self.name = name
         self.room = world[room_name]
-
+        self.health = health
+        self.bag = bag
+        
+    def move(self, direction):
+        if direction not in self.room.exits:
+            print("Cannot move in that direction!")
+            return
+        new_room_name = self.room.exits['room']
+        print('moving to', new_room_name)
+        self.room = world[new_room_name]
+        
 player = Player("Bob", 100, [], "introd")
 
+while True:
+    command = raw_input('>>')
+    if command in {'W', 'A', 'D'}:
+        player.move(command)
+    elif command == 'S':
+        print(player.room.description)
+        print('Exits', player.room.exits.keys())
+    else:
+        print('Invalid command')
+    
+
+class Room:
+    def __init__(name, description, links):
+        self.name = name
+        self.description = description
+        self.links = links
+
+world = {}
+world['introd'] = Room(
+    "introd",
+    """Welcome to my mansion, the door behind you is locked, you are stuck in here forever. If you listen to my commands you might survive. Move forward."""
+    ['W', 'upstairs']
+)
+world['upstairs'] = Room(
+    'upstairs',
+    'You are now upstairs go to the right in to that hallway',
+    ['S', 'introd']
+)
 
 
-        
-
-                                                                                    
