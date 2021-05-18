@@ -5,9 +5,19 @@ from time import sleep
 import time
 from tqdm import tqdm
 
-mylist = [1,2,3,4]
-for i in tqdm(mylist):
-    time.sleep(1)
+
+def clear():
+        # for windows
+    if name == 'nt':
+        _ = system('cls')
+  
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = system('clear')
+
+for i in tqdm(range(0, 100), mininterval = 3, 
+              desc ="LOADING GAME:"):
+    sleep(.1)
 
 
 TITLE = (""" __     __     ______     __         ______     ______     __    __     ______       
@@ -19,35 +29,25 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 ==================================================================================
 
 
-            ╔═╗╦═╗╔═╗╔═╗╔═╗  ╔═╗╔╗╔╔╦╗╔═╗╦═╗  ╔╦╗╔═╗  ╔╗ ╔═╗╔═╗╦╔╗╔
-            ╠═╝╠╦╝║╣ ╚═╗╚═╗  ║╣ ║║║ ║ ║╣ ╠╦╝   ║ ║ ║  ╠╩╗║╣ ║ ╦║║║║
-            ╩  ╩╚═╚═╝╚═╝╚═╝  ╚═╝╝╚╝ ╩ ╚═╝╩╚═   ╩ ╚═╝  ╚═╝╚═╝╚═╝╩╝╚╝
+┌─┐┬─┐┌─┐┌─┐┌─┐  ╔═╗╔╗╔╔═╗  ┌┬┐┌─┐  ┌┐ ┌─┐┌─┐┬┌┐┌
+├─┘├┬┘├┤ └─┐└─┐  ║ ║║║║║╣    │ │ │  ├┴┐├┤ │ ┬││││
+┴  ┴└─└─┘└─┘└─┘  ╚═╝╝╚╝╚═╝   ┴ └─┘  └─┘└─┘└─┘┴┘└┘
 
 =================================================================================
 """)
 
 def main_menu():
-    print(TITLE)
-    TITLE = input('Press Enter to continue')
-    title_screen = Input("""1. Play Game\n 2. Load Latest Save\n 3. Help 4. Lore/Story""")
-    if (title_screen == "Play Game"):
-        play_game()
-    #PLACEHOLDER FOR SAVE GAME
-    
+    title_screen = input(TITLE)
+    if (title_screen == "1"):
+        clear()
+    elif (title_screen != "1"):
+        title_screen = input(TITLE)
+        
+main_menu()
 
-    
-    
 
 sleep(2)
 
-def clear():
-        # for windows
-    if name == 'nt':
-        _ = system('cls')
-  
-    # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = system('clear')
 
 clear()
 
@@ -119,13 +119,16 @@ entrance = Location("entrance",
                     """You are standing in the entrance hall.
 There is a room on the left, a room on the right, and a kitchen in the back.    
 There is also a set of stairs in front of you.""",
-                    [Option("Left", KillPlayer("The building collapses")),
-                     Option("Right", KillPlayer("The building collapses")),
-                     Option("Kitchen", KillPlayer("The building collapses")),
-                     Option("Upstairs", KillPlayer("The building collapses")),
-                     Option("Outside", GoToLocation("start"))])
+                    [Option("Left", GoToLocation("Level 1 Empty Room")),
+                     Option("Right", GoToLocation("Blood Room")),
+                     Option("Forward", GoToLocation("Downstairs")),
+                     Option("Back", GoToLocation("start"))])
 
-
+Blood_room = Location("Blood Room",
+                      """You are in a blood-filled room. It stinks like body parts in here, whoever died in here must've been killed not too long ago.
+""",
+                      [Option("entrance", GoToLocation("entrance"))]),
+                       
 if(__name__=="__main__"):
     s = State(start_loc)
     s.addloc(start_loc)
@@ -168,6 +171,4 @@ It is very creepy up here""",
                                MultiAction([Message("You find a trapdoor!"),
                                           OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
 
-Option("Upstairs", GoToLoc("upstairs"))
 
-main_menu()
