@@ -5,6 +5,16 @@ from time import sleep
 import time
 from tqdm import tqdm
 
+class Character:
+    def __init__(self, class_name, strength, dexterity, intelligence):
+        self.name = name
+        self.lose_chance = lose
+        self.health = health
+
+def character_select():
+    global player_class
+    woman = Character
+    man = Character
 
 def clear():
         # for windows
@@ -37,11 +47,12 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 """)
 
 def main_menu():
-    title_screen = input(TITLE)
-    if (title_screen == "1"):
-        clear()
-    elif (title_screen != "1"):
+    while True:
         title_screen = input(TITLE)
+        if (title_screen == "1"):
+            break
+        elif (title_screen != "1"):
+            title_screen = input(TITLE)
         
 main_menu()
 
@@ -106,28 +117,16 @@ class KillPlayer:
     def __init__(self, message):
         self.message = message
 
+
     def execute(self, state):
         state.alive = False
         print(self.message)
+
 
 start_loc = Location("start",
                      "You're standing at the entrance to a spooky mansion",
                      [Option("Go Inside", GoToLocation("entrance")),
                       Option("Leave", KillPlayer("Scardy Cat"))])
-
-entrance = Location("entrance",
-                    """You are standing in the entrance hall.
-There is a room on the left, a room on the right, and a kitchen in the back.    
-There is also a set of stairs in front of you.""",
-                    [Option("Left", GoToLocation("Level 1 Empty Room")),
-                     Option("Right", GoToLocation("Blood Room")),
-                     Option("Forward", GoToLocation("Downstairs")),
-                     Option("Back", GoToLocation("start"))])
-
-Blood_room = Location("Blood Room",
-                      """You are in a blood-filled room. It stinks like body parts in here, whoever died in here must've been killed not too long ago.
-""",
-                      [Option("entrance", GoToLocation("entrance"))]),
                        
 if(__name__=="__main__"):
     s = State(start_loc)
@@ -164,11 +163,33 @@ class MultiAction:
         for action in self.actions:
             action.execute(state)
 
-newlocation = Location("upstairs", """You arrive in the attic.
+
+entrance = Location("entrance",
+                    """You are standing in the entrance hall.
+There is a room on your left and a room on your right.    
+There is also a set of stairs in front of you.""",
+                    [Option("Left", GoToLocation("Level 1 Empty Room")),
+                     Option("Right", GoToLocation("Blood Room")),
+                     Option("Forward", GoToLocation("upstairs")),
+                     Option("Back", GoToLocation("start"))])
+
+
+bloodroom = Location("Blood Room",
+                      """The walls in here are smothered with blood. It smells like body parts in here, whoever died in here must've been killed not too long ago.
+""",
+                      [Option("Back", GoToLocation("entrance"))]),
+
+upstairs = Location("upstairs", """You arrive in the attic.
 It is very creepy up here""",
-                       [Option("Downstairs", GoToLoc("entrance")),
+                       [Option("Back", GoToLoc("entrance")),
                         Option("Explore",
                                MultiAction([Message("You find a trapdoor!"),
                                           OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
 
+level_1_empty_room = Location("Level 1 Empty Room", """You arive in an empty room. There isn't much to look at in here
+""",
+                              [Option("Back", GoToLoc("entrance")),
+                               Option("Explore",
+                                      MultiAction([Message("You found a mysterious button!"),
+                                                   OptionMutator("Level 1 Empty Room", 3, Option("Button", KillPlayer("you die. It was a trapped door.")))]))])
 
