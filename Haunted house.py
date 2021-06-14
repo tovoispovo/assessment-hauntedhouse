@@ -68,12 +68,11 @@ class State:
         self.location = starting_loc
         self.locations = {}
 
-    def addloc(self, location):
-        self.locations[location.name] = location
+    def addloc(self, position):
+        self.locations[position.name] = position
 
     def gotoloc(self, locname):
         self.location = self.locations[locname]
-
 class Location:
     def __init__(self, name, desc, options=None):
         self.name = name
@@ -92,19 +91,17 @@ class Location:
         choice = input("> ")
         print ("You chose \"{0}\"".format(choice))
         try:
-            index = int(choice)
-            self.options[index].action.execute(state)
+            print(type(choice))
+            print(choice)
+            self.options[int(choice)].action.execute(state)
             return True
-        except Exception as e:
-            print(e)
+        except:
             print("Please choose a valid option")
             return False
-
 class Option:
     def __init__(self, text, action):
         self.text = text
         self.action = action
-
 class GoToLocation:
     def __init__(self, location):
         self.loc = location
@@ -117,32 +114,34 @@ class KillPlayer:
     def __init__(self, message):
         self.message = message
 
-
     def execute(self, state):
         state.alive = False
         print(self.message)
-
-
 start_loc = Location("start",
                      "You're standing at the entrance to a spooky mansion",
                      [Option("Go Inside", GoToLocation("entrance")),
                       Option("Leave", KillPlayer("Scardy Cat"))])
-                       
-if(__name__=="__main__"):
-    s = State(start_loc)
-    s.addloc(start_loc)
-    s.addloc(entrance)
-    s.location.start()
-    while(s.alive):
-        s.location.print_opts()
-        s.location.get_choice(s)
+
+entrance = Location("entrance",
+                    """You are standing in the entrance hall.
+There is a room on the left, a room on the right, and a kitchen in the back.    
+There is also a set of stairs in front of you.""",
+                    [Option("Left", KillPlayer("The building collapses")),
+                     Option("Right", KillPlayer("The building collapses")),
+                     Option("Kitchen", GoToLocation("blood room")),
+                     Option("Forward", GoToLocation("upstairs")),
+                     Option("Outside", GoToLocation("start"))])
+
+blood_room = Location("blood room",
+                      """This room is smothered with blood and smells like fresh body parts
+Someone has recently died in here. Better leave quickly."""
+                      [Option("back", GoToLocation("entrance"))])
 
 class Message:
     def __init__(self, msg):
         self.msg = msg
     def execute(self, state):
         print (self.msg)
-
 class OptionMutator:
     def __init__(self, location, index, newoption):
         self.locname = location
@@ -154,7 +153,6 @@ class OptionMutator:
             loc.options.append(self.newoption)
         else:
             loc.options[self.index] = self.newoption
-
 class MultiAction:
     def __init__(self, actions=None):
         self.actions = actions
@@ -162,34 +160,25 @@ class MultiAction:
         if(self.actions == None): return
         for action in self.actions:
             action.execute(state)
-
-
-entrance = Location("entrance",
-                    """You are standing in the entrance hall.
-There is a room on your left and a room on your right.    
-There is also a set of stairs in front of you.""",
-                    [Option("Left", GoToLocation("Level 1 Empty Room")),
-                     Option("Right", GoToLocation("Blood Room")),
-                     Option("Forward", GoToLocation("upstairs")),
-                     Option("Back", GoToLocation("start"))])
-
-
-bloodroom = Location("Blood Room",
-                      """The walls in here are smothered with blood. It smells like body parts in here, whoever died in here must've been killed not too long ago.
-""",
-                      [Option("Back", GoToLocation("entrance"))]),
-
 upstairs = Location("upstairs", """You arrive in the attic.
 It is very creepy up here""",
-                       [Option("Back", GoToLoc("entrance")),
+                       [Option("Downstairs", GoToLocation("entrance")),
                         Option("Explore",
                                MultiAction([Message("You find a trapdoor!"),
-                                          OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
+                                            OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
 
-level_1_empty_room = Location("Level 1 Empty Room", """You arive in an empty room. There isn't much to look at in here
-""",
-                              [Option("Back", GoToLoc("entrance")),
-                               Option("Explore",
-                                      MultiAction([Message("You found a mysterious button!"),
-                                                   OptionMutator("Level 1 Empty Room", 3, Option("Button", KillPlayer("you die. It was a trapped door.")))]))])
+
+
+
+if(__name__=="__main__"):
+    s = State(start_loc)
+    s.addloc(start_loc)
+    s.addloc(entrance)
+    s.addloc(upstairs)
+    s.addloc(blood_room)
+    s.location.start()
+    while(s.alive):
+        s.location.print_opts()
+        s.location.get_choice(s)
+
 
