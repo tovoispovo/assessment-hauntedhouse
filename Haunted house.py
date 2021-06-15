@@ -117,6 +117,9 @@ class KillPlayer:
     def execute(self, state):
         state.alive = False
         print(self.message)
+
+
+
 start_loc = Location("start",
                      "You're standing at the entrance to a spooky mansion",
                      [Option("Go Inside", GoToLocation("entrance")),
@@ -126,16 +129,21 @@ entrance = Location("entrance",
                     """You are standing in the entrance hall.
 There is a room on the left, a room on the right, and a kitchen in the back.    
 There is also a set of stairs in front of you.""",
-                    [Option("Left", KillPlayer("The building collapses")),
-                     Option("Right", KillPlayer("The building collapses")),
-                     Option("Kitchen", GoToLocation("blood room")),
+                    [Option("Left", KillPlayer("level 1 empty room")),
+                     Option("Right", GoToLocation("blood room")),
                      Option("Forward", GoToLocation("upstairs")),
-                     Option("Outside", GoToLocation("start"))])
+                     Option("Back", GoToLocation("start"))])
 
-blood_room = Location("blood room",
-                      """This room is smothered with blood and smells like fresh body parts
-Someone has recently died in here. Better leave quickly."""
-                      [Option("back", GoToLocation("entrance"))])
+                    
+level_1_hall = Location("level 1 hall",
+                        """further down the hall.""",
+                        [Option("Forward", GoToLocation("level 2 hall")),
+                         Option("Left", GoToLocation("level 1 empty room")),
+                         Option("Right", GoToLocation("frog room")),
+                         Option("Back", GoToLocation("level 1 hall"))])
+
+   
+
 
 class Message:
     def __init__(self, msg):
@@ -167,8 +175,19 @@ It is very creepy up here""",
                                MultiAction([Message("You find a trapdoor!"),
                                             OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
 
+frog_room = Location ("frog room",
+                      """a bunch of frogs""",
+                      [Option("Forward", GoToLocation("shaman room")),
+                       Option("Right", GoToLocation("snake room")),
+                       Option("Explore",
+                              MultiAction([Message("""       ()-()
+      .-(___)-.
+       _<   >_
+jgs    \/   \/"""), 3, Option("Woah I better leave quickly before something happens", GoToLocation("entrance")))]))])
 
 
+
+                        
 
 if(__name__=="__main__"):
     s = State(start_loc)
@@ -176,6 +195,8 @@ if(__name__=="__main__"):
     s.addloc(entrance)
     s.addloc(upstairs)
     s.addloc(blood_room)
+    s.addloc(mirror_room)
+    s.addloc(frog_room)
     s.location.start()
     while(s.alive):
         s.location.print_opts()
