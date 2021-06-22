@@ -21,7 +21,7 @@ def clear():
     if name == 'nt':
         _ = system('cls')
   
-    # for mac and linux(here, os.name is 'posix')
+    # for mac and linux
     else:
         _ = system('clear')
 
@@ -35,14 +35,10 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 \ \ \/ ".\ \  \ \  __\   \ \ \____  \ \ \____  \ \ \/\ \  \ \ \-./\ \  \ \  __\      
  \ \__/".~\_\  \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \ \_\  \ \_____\    
   \/_/   \/_/   \/_____/   \/_____/   \/_____/   \/_____/   \/_/  \/_/   \/_____/
-
 ==================================================================================
-
-
 ┌─┐┬─┐┌─┐┌─┐┌─┐  ╔═╗╔╗╔╔═╗  ┌┬┐┌─┐  ┌┐ ┌─┐┌─┐┬┌┐┌
 ├─┘├┬┘├┤ └─┐└─┐  ║ ║║║║║╣    │ │ │  ├┴┐├┤ │ ┬││││
 ┴  ┴└─└─┘└─┘└─┘  ╚═╝╝╚╝╚═╝   ┴ └─┘  └─┘└─┘└─┘┴┘└┘
-
 =================================================================================
 """)
 
@@ -85,17 +81,17 @@ class Location:
     def print_opts(self):
         if(self.options != None):
             for i in range(len(self.options)):
-                print ("  {0}. {1}".format(i, self.options[i].text))
+                print ("  {0}. {1}").format(i, self.options[i].text)
 
     def get_choice(self, state):
         choice = input("> ")
-        print ("You chose \"{0}\"".format(choice))
+        print ("You chose \"{0}\"").format(choice)
         try:
-            print(type(choice))
-            print(choice)
-            self.options[int(choice)].action.execute(state)
+            index = int(choice)
+            self.options[index].action.execute(state)
             return True
-        except:
+        except Exception as e:
+            print(e)
             print("Please choose a valid option")
             return False
 class Option:
@@ -128,19 +124,26 @@ start_loc = Location("start",
 entrance = Location("entrance",
                     """You are standing in the entrance hall.
 There is a room on the left, a room on the right, and a kitchen in the back.    
-There is also a set of stairs in front of you.""",
-                    [Option("Left", KillPlayer("level 1 empty room")),
+There is a door leading into the hall infront of you.""",
+                    [Option("Left", GoToLocation("level 1 empty room")),
                      Option("Right", GoToLocation("blood room")),
-                     Option("Forward", GoToLocation("upstairs")),
+                     Option("Forward", GoToLocation("level 1 hall")),
                      Option("Back", GoToLocation("start"))])
+
+blood_room = Location("blood room", "It smells like body parts. I better leave quickly.",
+                    [Option("Back", GoToLocation("entrance"))]) 
 
                     
 level_1_hall = Location("level 1 hall",
                         """further down the hall.""",
                         [Option("Forward", GoToLocation("level 2 hall")),
                          Option("Left", GoToLocation("level 1 empty room")),
-                         Option("Right", GoToLocation("frog room")),
-                         Option("Back", GoToLocation("level 1 hall"))])
+                         Option("Right", GoToLocation("frogs!")),
+                         Option("Back", GoToLocation("entrance"))])
+
+level_1_empty_room = Location("level 1 empty room",
+"Why am i in here, this room is boring", 
+                        [Option("Back", GoToLocation("level 1 hall"))])
 
    
 
@@ -175,15 +178,13 @@ It is very creepy up here""",
                                MultiAction([Message("You find a trapdoor!"),
                                             OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
 
-frog_room = Location ("frog room",
-                      """a bunch of frogs""",
-                      [Option("Forward", GoToLocation("shaman room")),
-                       Option("Right", GoToLocation("snake room")),
-                       Option("Explore",
-                              MultiAction([Message("""       ()-()
+frog_room = Location("frogs!", """Woah so many frogs!""", 
+                        [Option("Back", GoToLocation("level 1 hall")),
+                        Option('Explore',
+                        MultiAction([Message("""        ()-()
       .-(___)-.
        _<   >_
-jgs    \/   \/"""), 3, Option("Woah I better leave quickly before something happens", GoToLocation("entrance")))]))])
+jgs    \/   \/"""),OptionMutator("you pick up a frog", 2, Option("Poison", GoToLocation("entrance")))]))])
 
 
 
@@ -195,11 +196,10 @@ if(__name__=="__main__"):
     s.addloc(entrance)
     s.addloc(upstairs)
     s.addloc(blood_room)
-    s.addloc(mirror_room)
+    s.addloc(level_1_empty_room)
     s.addloc(frog_room)
+    s.addloc(level_1_hall)
     s.location.start()
     while(s.alive):
         s.location.print_opts()
         s.location.get_choice(s)
-
-
