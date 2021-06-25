@@ -21,7 +21,7 @@ def clear():
     if name == 'nt':
         _ = system('cls')
   
-    # for mac and linux
+    # for mac and linux(here, os.name is 'posix')
     else:
         _ = system('clear')
 
@@ -35,10 +35,14 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 \ \ \/ ".\ \  \ \  __\   \ \ \____  \ \ \____  \ \ \/\ \  \ \ \-./\ \  \ \  __\      
  \ \__/".~\_\  \ \_____\  \ \_____\  \ \_____\  \ \_____\  \ \_\ \ \_\  \ \_____\    
   \/_/   \/_/   \/_____/   \/_____/   \/_____/   \/_____/   \/_/  \/_/   \/_____/
+
 ==================================================================================
+
+
 ┌─┐┬─┐┌─┐┌─┐┌─┐  ╔═╗╔╗╔╔═╗  ┌┬┐┌─┐  ┌┐ ┌─┐┌─┐┬┌┐┌
 ├─┘├┬┘├┤ └─┐└─┐  ║ ║║║║║╣    │ │ │  ├┴┐├┤ │ ┬││││
 ┴  ┴└─└─┘└─┘└─┘  ╚═╝╝╚╝╚═╝   ┴ └─┘  └─┘└─┘└─┘┴┘└┘
+
 =================================================================================
 """)
 
@@ -64,8 +68,8 @@ class State:
         self.location = starting_loc
         self.locations = {}
 
-    def addloc(self, position):
-        self.locations[position.name] = position
+    def addloc(self, location):
+        self.locations[location.name] = location
 
     def gotoloc(self, locname):
         self.location = self.locations[locname]
@@ -81,11 +85,11 @@ class Location:
     def print_opts(self):
         if(self.options != None):
             for i in range(len(self.options)):
-                print ("  {0}. {1}").format(i, self.options[i].text)
+                print ("  {0}. {1}".format(i, self.options[i].text))
 
     def get_choice(self, state):
         choice = input("> ")
-        print ("You chose \"{0}\"").format(choice)
+        print ("You chose \"{0}\"".format(choice))
         try:
             index = int(choice)
             self.options[index].action.execute(state)
@@ -114,8 +118,6 @@ class KillPlayer:
         state.alive = False
         print(self.message)
 
-
-
 start_loc = Location("start",
                      "You're standing at the entrance to a spooky mansion",
                      [Option("Go Inside", GoToLocation("entrance")),
@@ -124,14 +126,16 @@ start_loc = Location("start",
 entrance = Location("entrance",
                     """You are standing in the entrance hall.
 There is a room on the left, a room on the right, and a kitchen in the back.    
-There is a door leading into the hall infront of you.""",
-                    [Option("Left", GoToLocation("level 1 empty room")),
+There is also a set of stairs in front of you.""",
+                    [Option("Left", GoToLocation("level 0 empty room")),
                      Option("Right", GoToLocation("blood room")),
                      Option("Forward", GoToLocation("level 1 hall")),
                      Option("Back", GoToLocation("start"))])
 
-blood_room = Location("blood room", "It smells like body parts. I better leave quickly.",
-                    [Option("Back", GoToLocation("entrance"))]) 
+blood_room = Location("blood room",
+                      """ It smells like body parts in here and it is not a pleasant.
+Can I leave already?""",
+                      [Option("Back", GoToLocation("entrance"))])
 
                     
 level_1_hall = Location("level 1 hall",
@@ -139,13 +143,27 @@ level_1_hall = Location("level 1 hall",
                         [Option("Forward", GoToLocation("level 2 hall")),
                          Option("Left", GoToLocation("level 1 empty room")),
                          Option("Right", GoToLocation("frogs!")),
-                         Option("Back", GoToLocation("entrance"))])
+                         Option("Back", GoToLocation("level 1 hall"))])
 
-level_1_empty_room = Location("level 1 empty room",
-"Why am i in here, this room is boring", 
-                        [Option("Back", GoToLocation("level 1 hall"))])
+frog_room = Location("frogs!",
+                     """frogs!
+                         ()-()       
+                       .-(___)-.
+                        _<   >_
+                        \/   \/
 
-   
+                         ()-()       
+                       .-(___)-.
+                        _<   >_
+                        \/   \/
+
+                         ()-()       
+                       .-(___)-.
+                        _<   >_
+                        \/   \/
+""",
+                     [Option("I should leave quickly", GoToLocation("level_1_hall")),
+                      Option("Explore", KillPlayer("The frogs were poisonous and you got poisoned. you died a painful death"))])
 
 
 class Message:
@@ -171,34 +189,31 @@ class MultiAction:
         if(self.actions == None): return
         for action in self.actions:
             action.execute(state)
+            
 upstairs = Location("upstairs", """You arrive in the attic.
 It is very creepy up here""",
                        [Option("Downstairs", GoToLocation("entrance")),
                         Option("Explore",
                                MultiAction([Message("You find a trapdoor!"),
                                             OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
-
-frog_room = Location("frogs!", """Woah so many frogs!""", 
-                        [Option("Back", GoToLocation("level 1 hall")),
-                        Option('Explore',
-                        MultiAction([Message("""        ()-()
-      .-(___)-.
-       _<   >_
-jgs    \/   \/"""),OptionMutator("you pick up a frog", 2, Option("Poison", GoToLocation("entrance")))]))])
+level_0_empty_room = Location("level 0 empty room",
+                              "Seems pretty empty, should I explore?",
+                              [Option("Back", GoToLocation("entrance")),
+                               Option("Explore", MultiAction([Message("It's just a table of fruit"),
+                                                              OptionMutator("boring", 3, Option("I'm Getting out of here", GoToLocation("level 1 hall")))]))])
 
 
 
-                        
 
 if(__name__=="__main__"):
     s = State(start_loc)
     s.addloc(start_loc)
     s.addloc(entrance)
     s.addloc(upstairs)
-    s.addloc(blood_room)
-    s.addloc(level_1_empty_room)
-    s.addloc(frog_room)
     s.addloc(level_1_hall)
+    s.addloc(frog_room)
+    s.addloc(blood_room)
+    s.addloc(level_0_empty_room)
     s.location.start()
     while(s.alive):
         s.location.print_opts()
