@@ -9,6 +9,7 @@ import sys
 import random
 import pickle
 
+#Clears the terminal
 def clear():
         # for windows
     if name == 'nt':
@@ -18,11 +19,12 @@ def clear():
     else:
         _ = system('clear')
 
+ #an iterative progress bar
 for i in tqdm(range(0, 100), mininterval = 3, 
               desc ="LOADING GAME:"):
     sleep(.1)
 
-
+#Prints the title screen when called
 TITLE = (""" __     __     ______     __         ______     ______     __    __     ______       
 /\ \  _ \ \   /\  ___\   /\ \       /\  ___\   /\  __ \   /\ "-./  \   /\  ___\      
 \ \ \/ ".\ \  \ \  __\   \ \ \____  \ \ \____  \ \ \/\ \  \ \ \-./\ \  \ \  __\      
@@ -37,6 +39,7 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 
 weapons = {"Level 2 Room Sword":40}
 
+#Stats of the player
 class Player:
     def __init__(self, name):
         self.name = name
@@ -59,6 +62,7 @@ class Player:
             
         return attack
 
+#The enemies and their stats
 class SpiderQueen:
     def __init__(self, name):
         self.name = name
@@ -86,14 +90,16 @@ class Bear:
         self.goldgain = 5
 BearIG = Bear("Bear")
 
+#The main menu, shows 3 options.
 def main():
-    print ("Welcome to my game!\n")
+    print (TITLE)
     print ("1.) Start")
     print ("2.) Load")
     print ("3.) Exit")
     option = input("-> ")
     if option == ("1"):
         start()
+    #Check save files
     elif option == "2":
         if os.path.exists("savefile") == True:
             with open('savefile', 'rb') as f:
