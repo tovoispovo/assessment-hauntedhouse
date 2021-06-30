@@ -118,6 +118,7 @@ def main():
     else:
         main()
 
+ #asks the user their name
 def start():
     print ("Hello, what is your name?")
     option = input("--> ")
@@ -159,6 +160,7 @@ sleep(2)
 
 clear()
 
+#The main state of the game, keeps track of the players location, if they are alive and a map of locations
 class State:
     def __init__(self, starting_loc):
         self.alive = True
@@ -170,6 +172,7 @@ class State:
 
     def gotoloc(self, locname):
         self.location = self.locations[locname]
+#Defines a location, also defining user input and executing if the answer is good
 class Location:
     def __init__(self, name, desc, options=None):
         self.name = name
@@ -195,7 +198,6 @@ class Location:
             print(e)
             print("Please choose a valid option")
             return False
-
 class Option:
     def __init__(self, text, action):
         self.text = text
@@ -207,7 +209,7 @@ class GoToLocation:
     def execute(self, state):
         state.gotoloc(self.loc)
         state.location.start()
-
+ #Kills the player and goes back to the title screen
 class KillPlayer:
     def __init__(self, message):
         self.message = message
@@ -301,7 +303,7 @@ level_0_empty_room = Location("level 0 empty room",
 
 
 
-
+#Puts the locations together so they can be travelled within
 if(__name__=="__main__"):
     s = State(start_loc)
     s.addloc(start_loc)
@@ -316,7 +318,7 @@ if(__name__=="__main__"):
         s.location.print_opts()
         s.location.get_choice(s)
 
-
+#Adds an inventory for the player to keep their items and gold
 def inventory():
     print ("what do you want to do?")
     print ("1.) Equip Weapon")
@@ -327,6 +329,7 @@ def inventory():
     elif option == ('b'):
         start1()
 
+#Defines an equip system, asks the player what they want to equip, and checks if it is valid
 def equip():
     print ("What do you want to equip?")
     for weapon in PlayerIG.weap:
@@ -349,7 +352,7 @@ def equip():
     
     
     
-
+#Index of enemies
 def prefight():
     global enemy
     enemynum = random.randint(1, 2, 3)
@@ -360,7 +363,7 @@ def prefight():
     else:
         enemy = BearIG
     fight()
-    
+ #The fight function for the main game   
 def fight():
     print ("%s     vs      %s" %(PlayerIG.name, enemy.name))
     print ("%s's Health: %d/%d    %s's Health: %i/%i" %(PlayerIG.name, PlayerIG.health, PlayerIG.maxhealth, enemy.name, enemy.health, enemy.maxhealth))
@@ -399,7 +402,7 @@ def attack():
         dead()
     else:
         fight()
-    
+#Drink a potion    
 def drinkpot():
     if PlayerIG.pots == 0:
         print ("You don't have any potions!")
@@ -410,7 +413,7 @@ def drinkpot():
         print ("You drank a potion!")
     option = input(' ')
     fight()
-
+#Run from the enemy to the previous location
 def run():
     runnum = random.randint(1, 3)
     if runnum == 1:
@@ -431,7 +434,7 @@ def run():
             dead()
         else:
             fight()
-
+#Win an recieve gold
 def win():
     enemy.health = enemy.maxhealth
     PlayerIG.gold += enemy.goldgain
@@ -439,13 +442,13 @@ def win():
     print ("You found %i gold!" %(enemy.goldgain))
     option = input(' ')
     start1()
-    
+ #Lose fight and receieve no rewards   
 def dead():
     print ("You have died")
     option = input(' ')
-    
+#A magic shop, checks if the user has enough gold to purchase, if not takes them back to the store menu
 def store():
-    print ("Welcome to the shop!")
+    print ("Welcome to the haunted magical shop!")
     print ("\nWhat would you like to buy?\n")
     print ("1.) Great Sword")
     print ("back")
