@@ -148,7 +148,6 @@ def start1():
     else:
         start1()
 
-
 sleep(2)
 
 
