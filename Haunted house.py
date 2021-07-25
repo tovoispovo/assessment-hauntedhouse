@@ -9,19 +9,9 @@ import sys
 import random
 import pickle
 
-#Clears the terminal
-def clear():
-        # for windows
-    if name == 'nt':
-        _ = system('cls')
-  
-    # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = system('clear')
-
  #an iterative progress bar
 for i in tqdm(range(0, 100), mininterval = 3, 
-              desc ="LOADING GAME:"):
+              desc ="LOADING HAUNTED COMBAT HOUSE:"):
     sleep(.1)
 
 #Prints the title screen when called
@@ -37,7 +27,8 @@ TITLE = (""" __     __     ______     __         ______     ______     __    __ 
 =================================================================================
 """)
 
-weapons = {"Level 2 Room Sword":40}
+#Items that the user can buy
+weapons = {"1":60, "2":100, "3":20, "4":10, "5":300, "6":20}
 
 #Stats of the player
 class Player:
@@ -50,7 +41,7 @@ class Player:
         self.pots = 0
         self.weap = ["Rusty Sword"]
         self.curweap = ["Rusty Sword"]
-        
+ #Defines damage of the weapons       
     @property 
     def attack(self):
         attack = self.base_attack
@@ -58,50 +49,116 @@ class Player:
             attack += 5
         
         if self.curweap == "Great Sword":
-            attack += 15
-            
-        return attack
+            attack += 60
 
-#The enemies and their stats
-class SpiderQueen:
+        if self.curweap == "WarSpear":
+            attack += 110
+        
+        if self.curweap == "Fighting Gloves":
+            attack += 25
+
+        if self.curweap == "Ghost Shard":
+            attack += 8
+        
+        if self.curweap == "Holy Sword":
+            attack += 200
+        
+        return attack
+        
+#Classes for Enemies, Sets their stats
+class Goblin:
     def __init__(self, name):
         self.name = name
-        self.maxhealth = 150
+        self.maxhealth = 50
         self.health = self.maxhealth
-        self.attack = 10
-        self.goldgain = 100
-SpiderQueenIG = SpiderQueen("SpiderQueen")
+        self.attack = 5
+        self.goldgain = 10
+GoblinIG = Goblin("Goblin")
+
+class Zombie:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 70
+        self.health = self.maxhealth
+        self.attack = 7
+        self.goldgain = 15
+ZombieIG = Zombie("Zombie")
+
+class Ghoul:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 60
+        self.health = self.maxhealth
+        self.attack = 9
+        self.goldgain = 15
+GhoulIG = Ghoul("Ghoul")
 
 class Spiders:
     def __init__(self, name):
         self.name = name
-        self.maxhealth = 25
+        self.maxhealth = 20
         self.health = self.maxhealth
-        self.attack = 2
-        self.goldgain = 5
+        self.attack = 3
+        self.goldgain = 2
 SpidersIG = Spiders("Spiders")
 
-class Bear:
+class Slimes:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 10
+        self.health = self.maxhealth
+        self.attack = 5
+        self.goldgain = 5
+SlimesIG = Slimes("Slimes")
+
+class Skeletons_Swords:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 50
+        self.health = self.maxhealth
+        self.attack = 10
+        self.goldgain = 50
+Skeletons_SwordsIG = Skeletons_Swords("Skeletons_Swords")
+
+class MasutaWarrior:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 65
+        self.health = self.maxhealth
+        self.attack = 50
+        self.goldgain = 200
+MasutaWarriorIG = MasutaWarrior("MasutaWarrior")
+
+class Reaper_Boss:
+    def __init__(self, name):
+        self.name = name
+        self.maxhealth = 500
+        self.health = self.maxhealth
+        self.attack = 5
+        self.goldgain = 300
+Reaper_BossIG = Reaper_Boss("Reaper_Boss")
+
+class The_Wind_Waker_Boss:
     def __init__(self, name):
         self.name = name
         self.maxhealth = 100
         self.health = self.maxhealth
-        self.attack = 10
-        self.goldgain = 5
-BearIG = Bear("Bear")
-
-#The main menu, shows 3 options.
+        self.attack = 20
+        self.goldgain = 500
+The_Wind_Waker_BossIG = The_Wind_Waker_Boss("The_Wind_Waker_Boss")
+#Main menu, displays options for the user
 def main():
+    os.system('cls')
     print (TITLE)
     print ("1.) Start")
     print ("2.) Load")
     print ("3.) Exit")
     option = input("-> ")
-    if option == ("1"):
+    if option == "1":
         start()
-    #Check save files
     elif option == "2":
         if os.path.exists("savefile") == True:
+            os.system('cls')
             with open('savefile', 'rb') as f:
                 global PlayerIG
                 PlayerIG = pickle.load(f)
@@ -113,224 +170,64 @@ def main():
             option = input(' ')
             main()
             
-    elif option == ("3"):
+    elif option == "3":
         sys.exit()
     else:
         main()
-
- #asks the user their name
+#Asks the user their name
 def start():
+    os.system('cls')
     print ("Hello, what is your name?")
     option = input("--> ")
     global PlayerIG
     PlayerIG = Player(option)
-
+    start1()
+#Main function of the game
 def start1():
-    print ("Name: {!s}".format(PlayerIG.name))
-    print ("Attack: %i" %(PlayerIG.attack))
-    print ("Gold: %d" %(PlayerIG.gold))
-    print ("Current Weapons: {!s}".format(PlayerIG.curweap)) 
-    print ("Potions: %d" %(PlayerIG.pots))
-    print ("Health: %i/%i\n" %(PlayerIG.health, PlayerIG.maxhealth))
-    print ("1.) Play")
+    os.system('cls')
+    print ("Name: %s" % (PlayerIG.name))
+    print ("Attack: %i" % (PlayerIG.attack))
+    print ("Gold: %d" % (PlayerIG.gold))
+    print ("Current Weapons: %s" % (PlayerIG.curweap))
+    print ("Potions: %d" % (PlayerIG.pots))
+    print ("Health: %i/%i\n" % (PlayerIG.health, PlayerIG.maxhealth))
+    print ("1.) Fight")
     print ("2.) Store")
     print ("3.) Save")
     print ("4.) Exit")
     print ("5.) Inventory")
     option = input("--> ")
-    if option == ("1"):
-        start2()
-    elif option == ("2"):
+    if option == "1":
+        prefight()
+    elif option == "2":
         store()
-    elif option == ("3"):
+    elif option == "3":
+        os.system('cls')
         with open('savefile', 'wb') as f:
             pickle.dump(PlayerIG, f)
             print ("\nGame has been saved!\n")
         option = input(' ')
         start1()
-    elif option == ("4"):
+    elif option == "4":
         sys.exit()
-    elif option == ("5"):
+    elif option == "5":
         inventory()
     else:
         start1()
-
-sleep(2)
-
-
-clear()
-
-#The main state of the game, keeps track of the players location, if they are alive and a map of locations
-class State:
-    def __init__(self, starting_loc):
-        self.alive = True
-        self.location = starting_loc
-        self.locations = {}
-
-    def addloc(self, location):
-        self.locations[location.name] = location
-
-    def gotoloc(self, locname):
-        self.location = self.locations[locname]
-#Defines a location, also defining user input and executing if the answer is good
-class Location:
-    def __init__(self, name, desc, options=None):
-        self.name = name
-        self.desc = desc
-        self.options = options
-
-    def start(self):
-        print (self.desc)
-
-    def print_opts(self):
-        if(self.options != None):
-            for i in range(len(self.options)):
-                print ("  {0}. {1}".format(i, self.options[i].text))
-
-    def get_choice(self, state):
-        choice = input("> ")
-        print ("You chose \"{0}\"".format(choice))
-        try:
-            index = int(choice)
-            self.options[index].action.execute(state)
-            return True
-        except Exception as e:
-            print(e)
-            print("Please choose a valid option")
-            return False
-class Option:
-    def __init__(self, text, action):
-        self.text = text
-        self.action = action
-class GoToLocation:
-    def __init__(self, location):
-        self.loc = location
-
-    def execute(self, state):
-        state.gotoloc(self.loc)
-        state.location.start()
- #Kills the player and goes back to the title screen
-class KillPlayer:
-    def __init__(self, message):
-        self.message = message
-        main()
-
-    def execute(self, state):
-        state.alive = False
-        print(self.message)
-
-start_loc = Location("start",
-                     "You're standing at the entrance to a spooky mansion",
-                     [Option("Go Inside", GoToLocation("entrance")),
-                      Option("Leave", KillPlayer("Scardy Cat"))])
-
-entrance = Location("entrance",
-                    """You are standing in the entrance hall.
-There is a room on the left, a room on the right, and a kitchen in the back.    
-There is also a set of stairs in front of you.""",
-                    [Option("Left", GoToLocation("level 0 empty room")),
-                     Option("Right", GoToLocation("blood room")),
-                     Option("Forward", GoToLocation("level 1 hall")),
-                     Option("Back", GoToLocation("start"))])
-
-blood_room = Location("blood room",
-                      """ It smells like body parts in here and it is not a pleasant.
-Can I leave already?""",
-                      [Option("Back", GoToLocation("entrance"))])
-
-                    
-level_1_hall = Location("level 1 hall",
-                        """further down the hall.""",
-                        [Option("Forward", GoToLocation("level 2 hall")),
-                         Option("Left", GoToLocation("level 1 empty room")),
-                         Option("Right", GoToLocation("frogs!")),
-                         Option("Back", GoToLocation("level 1 hall"))])
-
-frog_room = Location("frogs!",
-                     """frogs!
-                         ()-()       
-                       .-(___)-.
-                        _<   >_
-                        \/   \/
-                         ()-()       
-                       .-(___)-.
-                        _<   >_
-                        \/   \/
-                         ()-()       
-                       .-(___)-.
-                        _<   >_
-                        \/   \/
-""",
-                     [Option("I should leave quickly", GoToLocation("level_1_hall")),
-                      Option("Explore", KillPlayer("The frogs were poisonous and you got poisoned. you died a painful death"))])
-
-
-class Message:
-    def __init__(self, msg):
-        self.msg = msg
-    def execute(self, state):
-        print (self.msg)
-class OptionMutator:
-    def __init__(self, location, index, newoption):
-        self.locname = location
-        self.index = index
-        self.newoption = newoption
-    def execute(self, state):
-        loc = state.locations[self.locname]
-        if(self.index < 0 or self.index >= len(loc.options)):
-            loc.options.append(self.newoption)
-        else:
-            loc.options[self.index] = self.newoption
-class MultiAction:
-    def __init__(self, actions=None):
-        self.actions = actions
-    def execute(self, state):
-        if(self.actions == None): return
-        for action in self.actions:
-            action.execute(state)
-            
-upstairs = Location("upstairs", """You arrive in the attic.
-It is very creepy up here""",
-                       [Option("Downstairs", GoToLocation("entrance")),
-                        Option("Explore",
-                               MultiAction([Message("You find a trapdoor!"),
-                                            OptionMutator("upstairs", 3, Option("Trapdoor", KillPlayer("You die. It was a trapped door.")))]))])
-level_0_empty_room = Location("level 0 empty room",
-                              "Seems pretty empty, should I explore?",
-                              [Option("Back", GoToLocation("entrance")),
-                               Option("Explore", MultiAction([Message("It's just a table of fruit"),
-                                                              OptionMutator("level 0 empty room", 3, Option("Leave", GoToLocation("level 1 hall")))]))])
-
-
-
-#Puts the locations together so they can be travelled within
-if(__name__=="__main__"):
-    s = State(start_loc)
-    s.addloc(start_loc)
-    s.addloc(entrance)
-    s.addloc(upstairs)
-    s.addloc(level_1_hall)
-    s.addloc(frog_room)
-    s.addloc(blood_room)
-    s.addloc(level_0_empty_room)
-    s.location.start()
-    while(s.alive):
-        s.location.print_opts()
-        s.location.get_choice(s)
-
-#Adds an inventory for the player to keep their items and gold
+#Here they can equip weapons and see what is available to equip
 def inventory():
+    os.system('cls')
     print ("what do you want to do?")
     print ("1.) Equip Weapon")
     print ("b.) go back")
     option = input(">>> ")
-    if option == ("1"):
+    if option == "1":
         equip()
-    elif option == ('b'):
+    elif option == 'b':
         start1()
 
-#Defines an equip system, asks the player what they want to equip, and checks if it is valid
 def equip():
+    os.system('cls')
     print ("What do you want to equip?")
     for weapon in PlayerIG.weap:
         print (weapon)
@@ -340,81 +237,99 @@ def equip():
         print ("You already have that weapon equipped")
         option = input(" ")
         equip()
-    elif option == ("b"):
+    elif option == "b":
         inventory()
     elif option in PlayerIG.weap:
         PlayerIG.curweap = option
-        print ("You have equipped {!s}.".format(option))
+        print ("You have equipped %s." % (option))
         option = input(" ")
         equip()
     else:
-        print ("You don't have {!s} in your inventory".format(option))
+        print ("You don't have %s in your inventory" % (option))
     
     
     
-#Index of enemies
+#Random function for choosing enemies
 def prefight():
     global enemy
-    enemynum = random.randint(1, 2, 3)
+    enemynum = random.randint(1, 9)
     if enemynum == 1:
-        enemy = SpiderQueenIG
+        enemy = GoblinIG
     elif enemynum == 2:
+        enemy = ZombieIG
+    elif enemynum == 3:
+        enemy = GhoulIG
+    elif enemynum == 4:
         enemy = SpidersIG
-    else:
-        enemy = BearIG
+    elif enemynum == 5:
+        enemy = SlimesIG
+    elif enemynum == 6:
+        enemy = Skeletons_SwordsIG
+    elif enemynum == 7:
+        enemy = MasutaWarriorIG
+    elif enemynum == 8:
+        enemy = Reaper_BossIG
+    elif enemynum == 9:
+        enemy = The_Wind_Waker_BossIG
     fight()
- #The fight function for the main game   
+#Fight function, Player can choose whether to run, drink a potion, or attack the enemy
 def fight():
-    print ("%s     vs      %s" %(PlayerIG.name, enemy.name))
-    print ("%s's Health: %d/%d    %s's Health: %i/%i" %(PlayerIG.name, PlayerIG.health, PlayerIG.maxhealth, enemy.name, enemy.health, enemy.maxhealth))
-    print ("Potions %i\n" %(PlayerIG.pots)) 
+    os.system('cls')
+    print ("%s     vs      %s" % (PlayerIG.name, enemy.name))
+    print ("%s's Health: %d/%d    %s's Health: %i/%i" % (PlayerIG.name, PlayerIG.health, PlayerIG.maxhealth, enemy.name, enemy.health, enemy.maxhealth))
+    print ("Potions %i\n" % (PlayerIG.pots))
     print ("1.) Attack")
     print ("2.) Drink Potion")
     print ("3.) Run")
     option = input(' ')
-    if option == ("1"):
+    if option == "1":
         attack()
-    elif option == ("2"):
+    elif option == "2":
         drinkpot()
-    elif option == ("3"):
+    elif option == "3":
         run()
     else:
         fight()
-
+#This is based on their fighting stats
 def attack():
-    PAttack = random.randint(PlayerIG.attack / 2, PlayerIG.attack)
+    os.system('cls')
+    PAttack = random.uniform(PlayerIG.attack / 2, PlayerIG.attack)
     EAttack = random.uniform(enemy.attack / 2, enemy.attack)
     if PAttack == PlayerIG.attack / 2:
         print ("You miss!")
     else:
         enemy.health -= PAttack
-        print ("You deal %i damage!" %(PAttack))
+        print ("You deal %i damage!" % (PAttack))
     option = input(' ')
     if enemy.health <=0:
         win()
+    os.system('cls')
     if EAttack == enemy.attack/2:
         print ("The enemy missed!")
     else:
         PlayerIG.health -= EAttack
-        print ("The enemy deals %i damage!" %(EAttack))
+        print ("The enemy deals %i damage!" % (EAttack))
     option = input(' ')
     if PlayerIG.health <= 0:
         dead()
     else:
         fight()
-#Drink a potion    
+    
 def drinkpot():
+    os.system('cls')
     if PlayerIG.pots == 0:
         print ("You don't have any potions!")
     else:
         PlayerIG.health += 50
+        PlayerIG.pots - 1
         if PlayerIG.health > PlayerIG.maxhealth:
             PlayerIG.health = PlayerIG.maxhealth
         print ("You drank a potion!")
     option = input(' ')
     fight()
-#Run from the enemy to the previous location
+
 def run():
+    os.system('cls')
     runnum = random.randint(1, 3)
     if runnum == 1:
         print ("You have successfully ran away!")
@@ -423,55 +338,67 @@ def run():
     else:
         print ("You failed to get away!")
         option = input(' ')
-        EAttack = random.randint(enemy.attack / 2, enemy.attack)
+        os.system('cls')
+        EAttack = random.uniform(enemy.attack / 2, enemy.attack)
         if EAttack == enemy.attack/2:
             print ("The enemy missed!")
         else:
             PlayerIG.health -= EAttack
-            print ("The enemy deals %i damage!" %(EAttack))
+            print ("The enemy deals %i damage!" % (EAttack))
         option = input(' ')
         if PlayerIG.health <= 0:
             dead()
         else:
             fight()
-#Win an recieve gold
+
 def win():
+    os.system('cls')
     enemy.health = enemy.maxhealth
     PlayerIG.gold += enemy.goldgain
-    print ("You have defeated the {!s}".format(enemy.name))
-    print ("You found %i gold!" %(enemy.goldgain))
+    PlayerIG.pots += 1
+    print ("You have defeated the %s" % (enemy.name))
+    print ("You found %i gold!" % (enemy.goldgain))
     option = input(' ')
     start1()
- #Lose fight and receieve no rewards   
+    
 def dead():
+    os.system('cls')
     print ("You have died")
     option = input(' ')
-#A magic shop, checks if the user has enough gold to purchase, if not takes them back to the store menu
+    
 def store():
-    print ("Welcome to the haunted magical shop!")
+    os.system('cls')
+    print ("Welcome to the shop!")
     print ("\nWhat would you like to buy?\n")
-    print ("1.) Great Sword")
+    print ("1.) Great Sword, 60 gold: is strong against the foes in here!")
+    print ("2.) WarSpear, 100 gold: It's quite pointy.")
+    print ("3.) Fighting Gloves, 20 gold: Packs a punch!")
+    print ("4.) Ghost Shard, 10 gold: I guess you can use this as a weapon but it's not that effective.")
+    print ("5.) Holy Sword, 300 Gold: The sword that wields the power of the Gods!")
     print ("back")
     print (" ")
     option = input(' ')
     
     if option in weapons:
         if PlayerIG.gold >= weapons[option]:
+            os.system('cls')
             PlayerIG.gold -= weapons[option]
             PlayerIG.weap.append(option)
-            print ("You have bought {!s}".format(option))
+            print ("You have bought %s" % (option))
             option = input(' ')
             store()
         
         else:
+            os.system('cls')
             print ("You don't have enough gold")
             option = input(' ')
             store()
     
-    elif option == ("back"):
+    elif option == "back":
         start1()
     
     else:
+        os.system('cls')
         print ("That item does not exist")
         option = input(' ')
         store()
